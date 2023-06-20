@@ -7,7 +7,7 @@ Initial suite of data models published on EarthDataModels.org are largely based 
 
 - [Boreholes](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Boreholes)
 - [Geochemistry](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Geochemistry)
-- [Ladslides](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Landslides)
+- [Landslides](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Landslides)
 - [Lexicon](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Lexicon)
 - [Metadata](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Metadata)
 - [Oceanographic Database](http://www.bodc.ac.uk/about/information_technology/database_design/)
