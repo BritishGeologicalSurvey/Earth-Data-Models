@@ -5,12 +5,11 @@ Initial suite of data models published on EarthDataModels.org are largely based 
 
 ## Data Models
 
-- [Boreholes](http://www.earthdatamodels.org/designs/borehole_index.html)
-- [Geochemistry](http://www.earthdatamodels.org/designs/geochemistry_index.html)
-- [Geology](http://www.earthdatamodels.org/designs/geologyMaps_index.html)
-- [Geophysics](http://www.earthdatamodels.org/designs/geophysics_index.html)
-- [Lexicon](http://www.earthdatamodels.org/designs/lexicon_BGS.html)
-- [Metadata](http://www.earthdatamodels.org/designs/metadata_BGS.html)
+- [Boreholes](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Boreholes)
+- [Geochemistry](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Geochemistry)
+- [Ladslides](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Landslides)
+- [Lexicon](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Lexicon)
+- [Metadata](https://github.com/BritishGeologicalSurvey/Earth-Data-Models/tree/main/Metadata)
 - [Oceanographic Database](http://www.bodc.ac.uk/about/information_technology/database_design/)
 - Cadastre - Please submit!
 - [Water Quality](http://me.water.usgs.gov/reports/OFR01-485.pdf)
