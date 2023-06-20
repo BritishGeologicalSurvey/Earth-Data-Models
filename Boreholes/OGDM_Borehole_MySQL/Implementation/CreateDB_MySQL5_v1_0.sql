@@ -1,0 +1,662 @@
+--
+-- Terms of Use:  Free for commercial and non-commercial use.  Please acknowledge the material  as:  
+-- "Copyright/database right, reproduced with the permission of the British Geological Survey © NERC 2011.  All rights reserved”.
+--
+-- ER/Studio Data Architect 9.0 SQL Code Generation
+-- Company :      BGS
+-- Project :      BoreholeDatabase_ERS9.dm1
+-- Author :       BGS
+--
+-- Date Created : Monday, September 26, 2011 17:44:33
+-- Target DBMS : MySQL 5.x
+--
+
+-- 
+-- TABLE: BHD_INDEX 
+--
+
+CREATE TABLE BHD_INDEX(
+    BHD_INDEX_ID              DECIMAL(38, 0)    NOT NULL,
+    QS                        VARCHAR(6)        NOT NULL,
+    RT                        VARCHAR(2)        NOT NULL,
+    NUMB                      DECIMAL(5, 0)     NOT NULL,
+    BOREHOLE_SUFFIX           VARCHAR(4)        NOT NULL,
+    BOREHOLE_NAME             VARCHAR(100)      NOT NULL,
+    XY_SOURCE_CODE            VARCHAR(5),
+    CONFIDENTIALITY_CODE      VARCHAR(5)        DEFAULT '?',
+    INCLINATION_TYPE_CODE     VARCHAR(5)        DEFAULT '?' NOT NULL,
+    DRILLED_DATE              DATE,
+    DRILLED_DATE_PREC_CODE    VARCHAR(2)        DEFAULT '?',
+    DRILLED_LENGTH            DECIMAL(7, 2),
+    START_POINT_TYPE_CODE     VARCHAR(5)        DEFAULT '?' NOT NULL,
+    START_HEIGHT              DECIMAL(7, 2),
+    START_HEIGHT_PREC_CODE    VARCHAR(5)        DEFAULT '?',
+    DRILLING_METHOD_CODE      VARCHAR(5)        DEFAULT '?' NOT NULL,
+    CLIENT_CODE               VARCHAR(5)        DEFAULT '?' NOT NULL,
+    PURPOSE_CODE              VARCHAR(5)        DEFAULT '?',
+    COMMENTS                  VARCHAR(255),
+    X                         DECIMAL(0, 0),
+    Y                         DECIMAL(0, 0),
+    EPSG_CODE                 VARCHAR(20),
+    XA                        DECIMAL(0, 0),
+    YA                        DECIMAL(0, 0),
+    PRIMARY KEY (BHD_INDEX_ID)
+)ENGINE=INNODB
+COMMENT='Index table of borehole records in the Borehole database'
+;
+
+-- 
+-- TABLE: BHD_LOG 
+--
+
+CREATE TABLE BHD_LOG(
+    BHD_LOG_ID                INT               NOT NULL,
+    LAYER_ID                  INT               NOT NULL
+                              CHECK (LAYER_ID >=1),
+    BHD_INDEX_ID              DECIMAL(38, 0)    NOT NULL,
+    BHD_LOG_SOURCE_ID         INT               NOT NULL,
+    DRILLED_DEPTH_TOP         DECIMAL(9, 3),
+    DRILLED_DEPTH_BASE        DECIMAL(9, 3)     NOT NULL,
+    ORIGINAL_UNIT_CODE        VARCHAR(20)       DEFAULT '?' NOT NULL,
+    DEPTH_RELIABILITY_CODE    CHAR(1)           DEFAULT '?' NOT NULL,
+    LITHOLOGY_CODE            VARCHAR(6)        DEFAULT '?' NOT NULL,
+    LITHOSTRAT_CODE           VARCHAR(5)        DEFAULT '?' NOT NULL,
+    UNIT_DESCRIPTION          VARCHAR(2000),
+    BASE_BED_CODE             VARCHAR(10)       DEFAULT '?' NOT NULL,
+    COMMENTS                  VARCHAR(255),
+    PRIMARY KEY (BHD_LOG_ID)
+)
+COMMENT='Table to store geological information of the borehole log'
+;
+
+-- 
+-- TABLE: BHD_LOG_PROPERTY 
+--
+
+CREATE TABLE BHD_LOG_PROPERTY(
+    BHD_LOG_ID            INT             NOT NULL,
+    PROPERTY_TYPE_CODE    VARCHAR(14)     DEFAULT '?' NOT NULL,
+    PROPERTY_VALUE        VARCHAR(25)     NOT NULL,
+    QUALIFIER             CHAR(2)         
+                          CHECK (QUALIFIER IN ('<','>','?','>=','<=')),
+    COMMENTS              VARCHAR(255),
+    PRIMARY KEY (BHD_LOG_ID, PROPERTY_TYPE_CODE, PROPERTY_VALUE)
+)
+COMMENT='Table to store the borehole log property data'
+;
+
+-- 
+-- TABLE: BHD_LOG_SOURCE 
+--
+
+CREATE TABLE BHD_LOG_SOURCE(
+    BHD_LOG_SOURCE_ID     INT            NOT NULL,
+    INTERPRETER_ID        VARCHAR(11)    NOT NULL,
+    PROJECT_ID            INT,
+    SOURCE_MEDIUM_CODE    VARCHAR(5),
+    PRIMARY KEY (BHD_LOG_SOURCE_ID)
+)
+COMMENT='Grouping table for logs (incl. interpreter, project, medium)'
+;
+
+-- 
+-- TABLE: DIC_BASE_BED 
+--
+
+CREATE TABLE DIC_BASE_BED(
+    CODE           VARCHAR(10)     NOT NULL,
+    DESCRIPTION    VARCHAR(100)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (status in ('C', 'O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of base of bed codes'
+;
+
+-- 
+-- TABLE: DIC_BOREHOLE_DIRECTION 
+--
+
+CREATE TABLE DIC_BOREHOLE_DIRECTION(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table to store start point types of the borehole'
+;
+
+-- 
+-- TABLE: DIC_COMPANY 
+--
+
+CREATE TABLE DIC_COMPANY(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table to store list of client/company details'
+;
+
+-- 
+-- TABLE: DIC_CONFIDENTIALITY 
+--
+
+CREATE TABLE DIC_CONFIDENTIALITY(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of codes to describe resource confidentiality'
+;
+
+-- 
+-- TABLE: DIC_CRS_HORIZ_CS 
+--
+
+CREATE TABLE DIC_CRS_HORIZ_CS(
+    DESCRIPTION             VARCHAR(200)    NOT NULL,
+    TRANSLATION             VARCHAR(80)     NOT NULL,
+    EPSG_CODE               VARCHAR(20),
+    DATA_SOURCE             VARCHAR(20)     NOT NULL,
+    COORD_SYS_TYPE          VARCHAR(40)     NOT NULL,
+    DATUM_CODE              VARCHAR(20),
+    DATUM_TRANS             VARCHAR(80),
+    DATUM_ELLIPSOID         VARCHAR(80),
+    SOURCE_GEOGCS_CODE      VARCHAR(20),
+    PRIME_MERIDIAN          VARCHAR(80),
+    AREA_OF_USE_DETAILS     VARCHAR(500),
+    AREA_OF_USE_GROUP       VARCHAR(10)     NOT NULL,
+    COORD_TRF_EPSG_NAME     VARCHAR(50),
+    STATUS                  CHAR(1)         NOT NULL
+                            CHECK (status in ('C','O')),
+    CODE                    VARCHAR(20)     NOT NULL,
+    UNIT_OF_MEASURE_CODE    VARCHAR(20),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table of horizontal coordinate systems'
+;
+
+-- 
+-- TABLE: DIC_DATE_ACCURACY 
+--
+
+CREATE TABLE DIC_DATE_ACCURACY(
+    CODE           VARCHAR(2)      NOT NULL,
+    DESCRIPTION    VARCHAR(100)    NOT NULL,
+    TRANSLATION    VARCHAR(50)     NOT NULL,
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of date accuracies or time scales'
+;
+
+-- 
+-- TABLE: DIC_DEPTH_RELIABILITY 
+--
+
+CREATE TABLE DIC_DEPTH_RELIABILITY(
+    CODE           CHAR(1)        NOT NULL,
+    DESCRIPTION    VARCHAR(68)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)        DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of depth reliability values for borehole geology'
+;
+
+-- 
+-- TABLE: DIC_DRILLING_METHOD 
+--
+
+CREATE TABLE DIC_DRILLING_METHOD(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table to describe drilling method of a borehole'
+;
+
+-- 
+-- TABLE: DIC_DRILLING_PURPOSE 
+--
+
+CREATE TABLE DIC_DRILLING_PURPOSE(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table of codes to describe the drilling purposes'
+;
+
+-- 
+-- TABLE: DIC_INCLINATION 
+--
+
+CREATE TABLE DIC_INCLINATION(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table describing inclination of a borehole'
+;
+
+-- 
+-- TABLE: DIC_ORD_DATUM_PREC 
+--
+
+CREATE TABLE DIC_ORD_DATUM_PREC(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table describing accuracy of ordnance datum level'
+;
+
+-- 
+-- TABLE: DIC_PROPERTY_TYPE 
+--
+
+CREATE TABLE DIC_PROPERTY_TYPE(
+    DESCRIPTION    VARCHAR(100)    NOT NULL,
+    CODE           VARCHAR(14)     NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of various property types for borehole geology'
+;
+
+-- 
+-- TABLE: DIC_ROCK_ALL 
+--
+
+CREATE TABLE DIC_ROCK_ALL(
+    CODE           VARCHAR(6)      NOT NULL,
+    DESCRIPTION    VARCHAR(500)    NOT NULL,
+    TRANSLATION    VARCHAR(500),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table to store all the different rocks'
+;
+
+-- 
+-- TABLE: DIC_SOURCE_MEDIUM 
+--
+
+CREATE TABLE DIC_SOURCE_MEDIUM(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(255),
+    TRANSLATION    VARCHAR(50)     NOT NULL,
+    STATUS         CHAR(1)         
+                   CHECK (DIC_SOURCE_MEDIUM_CK1),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary of codes to describe source mediums/materials'
+;
+
+-- 
+-- TABLE: DIC_UNIT_OF_MEASURE 
+--
+
+CREATE TABLE DIC_UNIT_OF_MEASURE(
+    CODE                       VARCHAR(20)       NOT NULL,
+    DESCRIPTION                VARCHAR(200)      NOT NULL,
+    TRANSLATION                VARCHAR(80),
+    ABBREVIATION               VARCHAR(15),
+    EPSG_CODE                  VARCHAR(20),
+    DATA_SOURCE                VARCHAR(20),
+    TARGET_UOM_CODE            VARCHAR(20),
+    CONV_FACTOR_NUMERATOR      DECIMAL(10, 5),
+    CONV_FACTOR_DENOMINATOR    DECIMAL(10, 5),
+    UNIT_OF_MEAS_DIMENSION     VARCHAR(50)       
+                               CHECK (UNIT_OF_MEAS_DIMENSION in 
+('all','length','angle','scale','volumetric rate','mass rate','temperature','mass','volume','charge per mass',
+'time','Dimensionless','electric conductivity','volumetric mass','turbidity','area', 'density', '?', 'pressure',
+'ratio', 'resistivity', 'slowness', 'velocity'
+)),
+    REMARKS                    VARCHAR(255),
+    ORIG_INFORMATION_SOURCE    VARCHAR(255),
+    STATUS                     CHAR(1)           DEFAULT 'C' NOT NULL
+                               CHECK (status in ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table to store list of measurement units'
+;
+
+-- 
+-- TABLE: DIC_XYSOURCE 
+--
+
+CREATE TABLE DIC_XYSOURCE(
+    CODE           VARCHAR(5)      NOT NULL,
+    DESCRIPTION    VARCHAR(250)    NOT NULL,
+    TRANSLATION    VARCHAR(50),
+    STATUS         CHAR(1)         DEFAULT 'C' NOT NULL
+                   CHECK (STATUS IN ('C','O')),
+    PRIMARY KEY (CODE)
+)
+COMMENT='Dictionary table describing source of geographic coordinates'
+;
+
+-- 
+-- TABLE: LXN_UNIT 
+--
+
+CREATE TABLE LXN_UNIT(
+    LEX_CODE              VARCHAR(5)               NOT NULL
+                          CHECK (UPPER("LEX_CODE")="LEX_CODE"),
+    UNIT_NAME             NATIONAL VARCHAR(200)    NOT NULL,
+    UNIT_RANK_CODE        VARCHAR(2)               NOT NULL,
+    STATUS                CHAR(1)                  DEFAULT 'C' NOT NULL
+                          CHECK (STATUS in ('C', 'O')),
+    THEME_CODE            VARCHAR(6)               NOT NULL,
+    DEFNSTATUS_CODE       VARCHAR(6)               DEFAULT 'INDEX' NOT NULL,
+    FORMAL_OR_INFORMAL    VARCHAR(8)               DEFAULT 'FORMAL' NOT NULL
+                          CHECK (FORMAL_OR_INFORMAL in ('FORMAL', 'INFORMAL')),
+    ON_OR_OFFSHORE        VARCHAR(9)               DEFAULT 'BOTH' NOT NULL
+                          CHECK (ON_OR_OFFSHORE in ('ONSHORE', 'OFFSHORE', 'BOTH')),
+    UNITCLASS_CODE        VARCHAR(6)               NOT NULL,
+    PREFERRED_MAPCODE     VARCHAR(13)              DEFAULT 'notApplicable' NOT NULL,
+    REVISION_NUMBER       DECIMAL(2, 0)            DEFAULT 0 NOT NULL
+                          CHECK (REVISION_NUMBER>=0),
+    SCOPEBYAREA_CODE      VARCHAR(6)               NOT NULL,
+    PRIMARY KEY (LEX_CODE)
+)
+COMMENT='Index table of lexicon units within lexicon database'
+;
+
+-- 
+-- TABLE: PROJECT 
+--
+
+CREATE TABLE PROJECT(
+    PROJECT_ID           INT              NOT NULL,
+    DESCRIPTION          VARCHAR(255),
+    PROJECT_TYPE_CODE    VARCHAR(4)       NOT NULL,
+    START_DATE           DATE             NOT NULL,
+    FINISH_DATE          DATE             NOT NULL,
+    PROJ_LEADER_ID       VARCHAR(11),
+    STATUS               CHAR(1)          DEFAULT 'A' 
+                         CHECK (STATUS IN ('A','C','I')),
+    PROG_ID              DECIMAL(4, 0)    NOT NULL,
+    BUDGET               DECIMAL(9, 2),
+    DEPUTY_LEADER_ID     INT,
+    PROJECT_NAME         VARCHAR(100)     NOT NULL,
+    PRIMARY KEY (PROJECT_ID)
+)
+COMMENT='Table to store list of projects and their details'
+;
+
+-- 
+-- TABLE: STAFF 
+--
+
+CREATE TABLE STAFF(
+    STAFF_ID          VARCHAR(11)     NOT NULL,
+    FIRST_NAME        VARCHAR(50),
+    LAST_NAME         VARCHAR(30)     NOT NULL,
+    NAME_PREFIX       VARCHAR(4),
+    BUSINESS_TITLE    VARCHAR(64)     NOT NULL,
+    JOB_CODE          VARCHAR(240)    NOT NULL,
+    LOCATION          VARCHAR(26),
+    EMAIL_ID          VARCHAR(70),
+    STATUS_CODE       VARCHAR(2),
+    PRIMARY KEY (STAFF_ID)
+)
+COMMENT='Table to store list of staff and their details'
+;
+
+-- 
+-- INDEX: BHD_INDEX_NU2 
+--
+
+CREATE INDEX BHD_INDEX_NU2 ON BHD_INDEX(DRILLED_LENGTH)
+;
+-- 
+-- INDEX: BHD_INDEX_NU3 
+--
+
+CREATE INDEX BHD_INDEX_NU3 ON BHD_INDEX(BOREHOLE_NAME)
+;
+-- 
+-- INDEX: BHD_INDEX_NU5 
+--
+
+CREATE INDEX BHD_INDEX_NU5 ON BHD_INDEX(X, Y)
+;
+-- 
+-- INDEX: BHD_INDEX_UK1 
+--
+
+CREATE UNIQUE INDEX BHD_INDEX_UK1 ON BHD_INDEX(QS, RT, NUMB, BOREHOLE_SUFFIX)
+;
+-- 
+-- INDEX: BHD_LOG_UK1 
+--
+
+CREATE UNIQUE INDEX BHD_LOG_UK1 ON BHD_LOG(BHD_INDEX_ID, BHD_LOG_SOURCE_ID, LAYER_ID)
+;
+-- 
+-- INDEX: BHD_LOG_NU3 
+--
+
+CREATE INDEX BHD_LOG_NU3 ON BHD_LOG(LITHOSTRAT_CODE)
+;
+-- 
+-- INDEX: BHD_LOG_NU4 
+--
+
+CREATE INDEX BHD_LOG_NU4 ON BHD_LOG(DRILLED_DEPTH_BASE)
+;
+-- 
+-- INDEX: BHD_LOG_NU5 
+--
+
+CREATE INDEX BHD_LOG_NU5 ON BHD_LOG(LITHOLOGY_CODE)
+;
+-- 
+-- INDEX: DIC_UNIT_OF_MEASURE_NU1 
+--
+
+CREATE UNIQUE INDEX DIC_UNIT_OF_MEASURE_NU1 ON DIC_UNIT_OF_MEASURE(ABBREVIATION)
+;
+-- 
+-- INDEX: DIC_UNIT_OF_MEASURE_U1 
+--
+
+CREATE UNIQUE INDEX DIC_UNIT_OF_MEASURE_U1 ON DIC_UNIT_OF_MEASURE(DESCRIPTION)
+;
+-- 
+-- INDEX: DIC_UNIT_OF_MEASURE_U2 
+--
+
+CREATE UNIQUE INDEX DIC_UNIT_OF_MEASURE_U2 ON DIC_UNIT_OF_MEASURE(TRANSLATION)
+;
+-- 
+-- INDEX: LXN_UNIT_U1 
+--
+
+CREATE UNIQUE INDEX LXN_UNIT_U1 ON LXN_UNIT(UNIT_NAME)
+;
+-- 
+-- TABLE: BHD_INDEX 
+--
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK1 
+    FOREIGN KEY (DRILLED_DATE_PREC_CODE)
+    REFERENCES DIC_DATE_ACCURACY(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK10 
+    FOREIGN KEY (EPSG_CODE)
+    REFERENCES DIC_CRS_HORIZ_CS(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK2 
+    FOREIGN KEY (XY_SOURCE_CODE)
+    REFERENCES DIC_XYSOURCE(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK3 
+    FOREIGN KEY (CONFIDENTIALITY_CODE)
+    REFERENCES DIC_CONFIDENTIALITY(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK4 
+    FOREIGN KEY (INCLINATION_TYPE_CODE)
+    REFERENCES DIC_INCLINATION(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK5 
+    FOREIGN KEY (START_POINT_TYPE_CODE)
+    REFERENCES DIC_BOREHOLE_DIRECTION(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK6 
+    FOREIGN KEY (START_HEIGHT_PREC_CODE)
+    REFERENCES DIC_ORD_DATUM_PREC(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK7 
+    FOREIGN KEY (DRILLING_METHOD_CODE)
+    REFERENCES DIC_DRILLING_METHOD(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK8 
+    FOREIGN KEY (CLIENT_CODE)
+    REFERENCES DIC_COMPANY(CODE)
+;
+
+ALTER TABLE BHD_INDEX ADD CONSTRAINT BHD_INDEX_FK9 
+    FOREIGN KEY (PURPOSE_CODE)
+    REFERENCES DIC_DRILLING_PURPOSE(CODE)
+;
+
+
+-- 
+-- TABLE: BHD_LOG 
+--
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK1 
+    FOREIGN KEY (BHD_INDEX_ID)
+    REFERENCES BHD_INDEX(BHD_INDEX_ID)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK2 
+    FOREIGN KEY (BHD_LOG_SOURCE_ID)
+    REFERENCES BHD_LOG_SOURCE(BHD_LOG_SOURCE_ID)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK3 
+    FOREIGN KEY (DEPTH_RELIABILITY_CODE)
+    REFERENCES DIC_DEPTH_RELIABILITY(CODE)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK4 
+    FOREIGN KEY (ORIGINAL_UNIT_CODE)
+    REFERENCES DIC_UNIT_OF_MEASURE(CODE)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK5 
+    FOREIGN KEY (LITHOLOGY_CODE)
+    REFERENCES DIC_ROCK_ALL(CODE)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK6 
+    FOREIGN KEY (LITHOSTRAT_CODE)
+    REFERENCES LXN_UNIT(LEX_CODE)
+;
+
+ALTER TABLE BHD_LOG ADD CONSTRAINT BHD_LOG_FK7 
+    FOREIGN KEY (BASE_BED_CODE)
+    REFERENCES DIC_BASE_BED(CODE)
+;
+
+
+-- 
+-- TABLE: BHD_LOG_PROPERTY 
+--
+
+ALTER TABLE BHD_LOG_PROPERTY ADD CONSTRAINT BHD_LOG_PROPERTY_FK1 
+    FOREIGN KEY (BHD_LOG_ID)
+    REFERENCES BHD_LOG(BHD_LOG_ID)
+;
+
+ALTER TABLE BHD_LOG_PROPERTY ADD CONSTRAINT BHD_LOG_PROPERTY_FK2 
+    FOREIGN KEY (PROPERTY_TYPE_CODE)
+    REFERENCES DIC_PROPERTY_TYPE(CODE)
+;
+
+
+-- 
+-- TABLE: BHD_LOG_SOURCE 
+--
+
+ALTER TABLE BHD_LOG_SOURCE ADD CONSTRAINT BHD_LOG_HEAD_FK1 
+    FOREIGN KEY (PROJECT_ID)
+    REFERENCES PROJECT(PROJECT_ID)
+;
+
+ALTER TABLE BHD_LOG_SOURCE ADD CONSTRAINT BHD_LOG_HEAD_FK2 
+    FOREIGN KEY (INTERPRETER_ID)
+    REFERENCES STAFF(STAFF_ID)
+;
+
+ALTER TABLE BHD_LOG_SOURCE ADD CONSTRAINT BHD_LOG_HEAD_FK3 
+    FOREIGN KEY (SOURCE_MEDIUM_CODE)
+    REFERENCES DIC_SOURCE_MEDIUM(CODE)
+;
+
+
+-- 
+-- TABLE: DIC_CRS_HORIZ_CS 
+--
+
+ALTER TABLE DIC_CRS_HORIZ_CS ADD CONSTRAINT DIC_CRS_HORIZ_CS_FK1 
+    FOREIGN KEY (UNIT_OF_MEASURE_CODE)
+    REFERENCES DIC_UNIT_OF_MEASURE(CODE)
+;
+
+ALTER TABLE DIC_CRS_HORIZ_CS ADD CONSTRAINT DIC_CRS_HORIZ_CS_FK2 
+    FOREIGN KEY (SOURCE_GEOGCS_CODE)
+    REFERENCES DIC_CRS_HORIZ_CS(CODE)
+;
+
+
+-- 
+-- TABLE: DIC_UNIT_OF_MEASURE 
+--
+
+ALTER TABLE DIC_UNIT_OF_MEASURE ADD CONSTRAINT DIC_UNIT_OF_MEASURE_FK1 
+    FOREIGN KEY (TARGET_UOM_CODE)
+    REFERENCES DIC_UNIT_OF_MEASURE(CODE)
+;
+
+
